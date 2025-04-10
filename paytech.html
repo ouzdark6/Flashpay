@@ -254,7 +254,7 @@
         // api data to add data related to the first step payment
         // data realted to the first step: amount, client_phone, order_Id, date
         
-        const S1_API_URL = 'https://script.google.com/macros/s/AKfycbyw-WfeWDoDSgjDTH_llMKaRzE4n8dpryv5sbzlY80aCcOE5JK7nLmNj4hN5BvAPsNJkQ/exec';
+        const S1_API_URL = 'https://script.google.com/macros/s/AKfycbzE7UWpUgZ3xPAMTKF6TS0t1-jgqXxBGXItbkA59JYsCOWX6XMEMWv_1jcQY_gazJ9_/exec';
         const S1_SECRET_KEY = '?i_Ke:Zqv%hL3ML/m!8|ayqJPf{(!,VGr$[o|W5&&KbuEFqgeda~H-sa';
         const P_API_KEY = '8d777022756712f2718dad9de3794c18c7d74ea32279e95b96cf18dd0d83a828';
         const P_API_SECRET = '4b03e5326fdc7c2af9b09786de101c80698c605ca32260df187d833584a0347c'; 
@@ -327,9 +327,9 @@
                     ref_command: transaction_id,  // Référence unique pour la transaction
                     command_name: "776633882-USER-1",
                     env: "test",  // ou "prod" selon l'environnement
-                    ipn_url: "https://script.google.com/macros/s/AKfycbw55cJ6pYeie0djTzjF37qEQOMs-BJ-geDbi6rw3aBttElC4YUHAJ7rSjpIXkMEjEj-/exec",  // URL pour notification IPN
-                    success_url: "https://ouzdark123.github.io/index/index.html",  // URL après succès
-                    cancel_url: "https://ouzdark123.github.io/index/index.html",  // URL en cas d'annulation
+                    ipn_url: "https://script.google.com/macros/s/AKfycbw-t_bwbx32cNO8SjJCl5HY23opMVwbv72gCbJ0Vmzm8oLRi3ShxcqrSbJEiVJ_g78S/exec",  // URL pour notification IPN
+                    success_url: "https://ouzdark6.github.io/Flashpay/status.html",  // URL après succès
+                    cancel_url: "https://ouzdark6.github.io/Flashpay/status.html",  // URL en cas d'annulation
                 };
 
                 fetch('https://paytech.sn/api/payment/request-payment', {
