@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>QCommande de Carte NFC - SparkLink</title>
+    <title>Commande de Carte NFC - SparkLink</title>
     <style>
         /* Styles de base conservés */
         body {
@@ -135,8 +135,6 @@
     </style>
     <!-- Script TouchPay -->
     <script src="https://touchpay.gutouch.net/touchpayv2/script/touchpaynr/prod_touchpay-0.0.1.js"></script>
-    <link rel="stylesheet" href="https://paytech.sn/cdn/paytech.min.css">
-    <script src="https://paytech.sn/cdn/paytech.min.js"></script>
 </head>
 <body>
     <form id="nfcForm">
@@ -226,156 +224,138 @@
     </div>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@4/dist/email.min.js"></script>
- <script>
-     // Initialisation de l'API EmailJS
-emailjs.init("jDP_quiL9Ze-wptPf");
-
-// Fonction pour générer un identifiant de commande aléatoire
-function xorder_id() {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let orderId = '';
-    for (let i = 0; i < 6; i++) {
-        orderId += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
-    return orderId;
-}
-
-// Fonction pour obtenir la date et l'heure actuelles
-function xdate() {
-    const now = new Date();
-    
-    const day = String(now.getDate()).padStart(2, '0');
-    const month = String(now.getMonth() + 1).padStart(2, '0'); // Les mois commencent à 0
-    const year = now.getFullYear();
-    
-    const hours = String(now.getHours()).padStart(2, '0');
-    const minutes = String(now.getMinutes()).padStart(2, '0');
-    const seconds = String(now.getSeconds()).padStart(2, '0');
-    
-    return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
-}
-
-// URL de l'API pour envoyer les données à Google Sheets
-const S1_API_URL = 'https://script.google.com/macros/s/AKfycbzbPFCFZbAMsSqK_IrfO6uUqVdZi65RKzct3e6HUfxftdlGZN5B5AyY4MLTLrePJKaQLw/exec';
-
-// Clé secrète de l'API
-const S1_SECRET_KEY = '?i_Ke:Zqv%hL3ML/m!8|ayqJPf{(!,VGr$[o|W5&&KbuEFqgeda~H-sa';
-
-// Clé de l'API pour PayTech
-const P_API_KEY = '8d777022756712f2718dad9de3794c18c7d74ea32279e95b96cf18dd0d83a828';
-const P_API_SECRET = '4b03e5326fdc7c2af9b09786de101c80698c605ca32260df187d833584a0347c';
-
-// Fonction pour valider le formulaire avant de lancer le paiement
-function validateAndPay() {
-    if (validateForm()) { 
-        xpay();
-    }
-}
-
-sendDataToSheet('amount', 'client_phone', 'order_id', 'date', 'transactionId', 'pattern');
-
-// Fonction pour valider les champs du formulaire
-function validateForm() {
-    const requiredFields = ['amount', 'phone', 'pattern']; // Ajoute d'autres champs si nécessaire
-    let isValid = true;
-
-    requiredFields.forEach(fieldId => {
-        const field = document.getElementById(fieldId);
-        if (!field.value.trim()) {
-            field.style.borderColor = 'red';
-            isValid = false;
-        } else {
-            field.style.borderColor = '#ddd';
-        }
-    });
-
-    return isValid;
-}
-
-// Fonction pour traiter le paiement
-function xpay() {
-    let client_phone = document.getElementById('phone').value;
-    let amount = document.getElementById('amount').value;
-    let pattern = document.getElementById('pattern').value;
-
-    let order_id = xorder_id();
-    let date = xdate();
-    let transactionId = 'SPARK-' + Date.now();
-
-    // Envoi des données à Google Sheets via l'API
-    sendDataToSheet(amount, client_phone, order_id, date, transactionId, pattern);
-
-    // Initialisation du paiement
-    init_payment(transactionId, amount);
-}
-
-// Fonction pour envoyer les données au Google Sheets
-function sendDataToSheet(amount, client_phone, order_id, date, transactionId, pattern) {
-    fetch(S1_API_URL + `?secret_key=${S1_SECRET_KEY}`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-            amount: amount,
-            client_phone: client_phone,
-            order_id: order_id,
-            date: date,
-            transactionId: transactionId,
-            pattern: pattern
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Réponse de Google Sheets:", data);
-    })
-    .catch(error => {
-        console.error("Erreur lors de l'envoi des données à Google Sheets:", error);
-    });
-}
-
-// Fonction pour initier le paiement via PayTech
-function init_payment(transaction_id, amount) {
-    const paymentParams = {
-        item_name: "Undefined",
-        item_price: amount,
-        currency: "XOF",
-        ref_command: transaction_id,  // Référence unique pour la transaction
-        command_name: "776633882-USER-1",
-        env: "test",  // ou "prod" selon l'environnement
-        ipn_url: "https://script.google.com/macros/s/AKfycbw-t_bwbx32cNO8SjJCl5HY23opMVwbv72gCbJ0Vmzm8oLRi3ShxcqrSbJEiVJ_g78S/exec",  // URL pour notification IPN
-        success_url: "https://ouzdark6.github.io/Flashpay/status.html",  // URL après succès
-        cancel_url: "https://ouzdark6.github.io/Flashpay/status.html",  // URL en cas d'annulation
-    };
-
-    fetch('https://paytech.sn/api/payment/request-payment', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'API_KEY': P_API_KEY,
-            'API_SECRET': P_API_SECRET,
-        },
-        body: JSON.stringify(paymentParams),
-    })
-    .then(response => response.json())
-    .then(data => {
-        console.log("Réponse de l'API PayTech:", data);
-        if (data.success === 1) {
-            // Utilisation de redirect_url renvoyée par l'API
-            new PayTech({}).withOption({
-                tokenUrl: data.redirect_url, // Remplacez tokenUrl par redirect_url
-                prensentationMode: PayTech.OPEN_IN_SAME_TAB,
-            }).send();
-        } else {
-            console.error("Erreur lors de la création de la demande de paiement", data.error_message);
-            alert("Erreur lors de la demande de paiement: " + data.error_message);
-        }
-    })
-    .catch(error => {
-        console.error("Erreur lors de la demande de paiement:", error);
-    });
-}
-
- </script>
+    <link rel="stylesheet" href="https://paytech.sn/cdn/paytech.min.css">
+    <script src="https://paytech.sn/cdn/paytech.min.js"></script>
+    <script>
+      // Génère un ID de commande unique
+      function xorder_id() {
+          const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+          let orderId = '';
+          for (let i = 0; i < 6; i++) {
+              orderId += chars.charAt(Math.floor(Math.random() * chars.length));
+          }
+          return orderId;
+      }
+  
+      // Renvoie la date/heure actuelle
+      function xdate() {
+          const now = new Date();
+          const day = String(now.getDate()).padStart(2, '0');
+          const month = String(now.getMonth() + 1).padStart(2, '0');
+          const year = now.getFullYear();
+          const hours = String(now.getHours()).padStart(2, '0');
+          const minutes = String(now.getMinutes()).padStart(2, '0');
+          const seconds = String(now.getSeconds()).padStart(2, '0');
+          return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+      }
+  
+      // API config
+      const S1_API_URL = 'https://script.google.com/macros/s/AKfycbxxwv2A2LMzKnd76TxRTTxYsIGigR4vnMiVnJxQCmQAlGh2BMQlQ1VwplPOt_stWohlpQ/exec';
+      const S1_SECRET_KEY = '?i_Ke:Zqv%hL3ML/m!8|ayqJPf{(!,VGr$[o|W5&&KbuEFqgeda~H-sa';
+      const P_API_KEY = 'aa0b620b1af10d9d042bf8e585878e04b9ebe06d3b39f0000962192f80957684';
+      const P_API_SECRET = '9b9a7191bdd46707acf6cfce3ea5952ff9794d62f286721bb43e09450e0d0d34';
+  
+      let transactionId = 'SPARK-' + Date.now();
+      let order_id = xorder_id();
+      let date = xdate();
+  
+      // Validation et lancement du paiement
+      function validateAndPay() {
+          if (validateForm()) {
+              let client_phone = document.getElementById('phone').value;
+              let amount = document.getElementById('amount').value;
+              let pattern = document.getElementById('pattern').value;
+  
+              sendDataToSheet(amount, client_phone, order_id, date, transactionId, pattern);
+              init_payment(transactionId, amount);
+          }
+      }
+  
+      function validateForm() {
+          const requiredFields = ['amount', 'phone', 'pattern'];
+          let isValid = true;
+  
+          requiredFields.forEach(fieldId => {
+              const field = document.getElementById(fieldId);
+              if (!field.value.trim()) {
+                  field.style.borderColor = 'red';
+                  isValid = false;
+              } else {
+                  field.style.borderColor = '#ddd';
+              }
+          });
+  
+          return isValid;
+      }
+  
+      // Envoie des données à Google Sheets
+      function sendDataToSheet(amount, clientPhone, orderId, date, transactionId, pattern) {
+          const data = {
+              amount: amount,
+              clientPhone: clientPhone,
+              orderId: orderId,
+              date: date,
+              transactionId: transactionId,
+              pattern: pattern,
+              token: S1_SECRET_KEY
+          };
+  
+          fetch(S1_API_URL, {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/x-www-form-urlencoded',
+              },
+              body: new URLSearchParams(data)
+          })
+          .then(response => response.text())
+          .then(data => {
+              console.log('Réponse du serveur:', data);
+          })
+          .catch(error => {
+              console.error('Erreur:', error);
+          });
+      }
+  
+      // Paiement avec PayTech
+      function init_payment(transaction_id, amount) {
+          const paymentParams = {
+              item_name: "Carte NFC",
+              item_price: amount,
+              currency: "XOF",
+              ref_command: transaction_id,
+              command_name: "776633882-USER-1",
+              env: "test",
+              ipn_url: "https://script.google.com/macros/s/AKfycbxxwv2A2LMzKnd76TxRTTxYsIGigR4vnMiVnJxQCmQAlGh2BMQlQ1VwplPOt_stWohlpQ/exec",
+              success_url: "https://ouzdark6.github.io/Flashpay/status.html",
+              cancel_url: "https://ouzdark6.github.io/Flashpay/status.html",
+          };
+  
+          fetch('https://paytech.sn/api/payment/request-payment', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json',
+                  'API_KEY': P_API_KEY,
+                  'API_SECRET': P_API_SECRET,
+              },
+              body: JSON.stringify(paymentParams),
+          })
+          .then(response => response.json())
+          .then(data => {
+              if (data.success === 1) {
+                  new PayTech({}).withOption({
+                      tokenUrl: data.redirect_url,
+                      prensentationMode: PayTech.OPEN_IN_SAME_TAB,
+                  }).send();
+              } else {
+                  alert("Erreur: " + data.error_message);
+              }
+          })
+          .catch(error => {
+              alert("Erreur de communication avec PayTech.");
+              console.error(error);
+          });
+      }
+  </script>
+  
 </body>
 </html>
