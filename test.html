@@ -1,0 +1,45 @@
+```
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Paiement PayTech</title>
+  <script src="https://paytech.sn/cdn/paytech.min.js"></script>
+</head>
+<body>
+
+  <button onclick="buy()">Payer 5 000 XOF</button>
+
+  <script>
+    function buy() {
+      const postData = {
+        motif: 'Paiement Abonnement',
+        telephone: '771234567',
+        montant: '5000'
+      };
+
+      (new PayTech(postData)).withOption({
+        requestTokenUrl: 'https://script.google.com/macros/s/AKfycbxZbooPDzyLxDektikJlsJ376lV45NxjPx7J76qom8w2rFW7ab0Z-IgFohWhoPVXaWT/exec',
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json'
+        },
+        prensentationMode: PayTech.OPEN_IN_POPUP,
+        didGetToken: function (token, redirectUrl) {
+          console.log('Token reçu:', token);
+        },
+        didReceiveError: function (error) {
+          console.error('Erreur:', error);
+        },
+        didReceiveNonSuccessResponse: function (response) {
+          console.warn('Réponse non success:', response);
+        }
+      }).send();
+    }
+  </script>
+</body>
+</html>
+
+
+```
