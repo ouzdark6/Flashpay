@@ -6,8 +6,7 @@
   <script src="https://paytech.sn/cdn/paytech.min.js"></script>
 </head>
 <body>
-
-  <button onclick="buy()">iPayer 5 000 XOF</button>
+  <button onclick="buy()">Payer 5 000 XOF</button>
 
   <script>
     function buy() {
@@ -26,7 +25,7 @@
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        prensentationMode: PayTech.OPEN_IN_POPUP,
+        presentationMode: PayTech.OPEN_IN_POPUP, // ✅ CORRECT
         didGetToken: function (token, redirectUrl) {
           console.log('✅ Token reçu:', token);
         },
