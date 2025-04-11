@@ -419,45 +419,47 @@
       }
   
       // Paiement avec PayTech
-      function init_payment(transaction_id, amount) {
-          setTempVar("Admin", "transaction_id");
-          const paymentParams = {
-              item_name: "Carte NFC",
-              item_price: amount,
-              currency: "XOF",
-              ref_command: transaction_id,
-              command_name: "776633882-USER-1",
-              env: "test",
-              ipn_url: "https://script.google.com/macros/s/AKfycbxxwv2A2LMzKnd76TxRTTxYsIGigR4vnMiVnJxQCmQAlGh2BMQlQ1VwplPOt_stWohlpQ/exec",
-              success_url: "https://ouzdark6.github.io/Flashpay/paytech.html?transaction_id=" + transaction_id,
-              cancel_url: "https://ouzdark6.github.io/Flashpay/paytech.html?transaction_id=" + transaction_id,
-          };
-  
-          fetch('https://paytech.sn/api/payment/request-payment', {
-              method: 'POST',
-              headers: {
-                  'Content-Type': 'application/json',
-                  'API_KEY': P_API_KEY,
-                  'API_SECRET': P_API_SECRET,
-              },
-              body: JSON.stringify(paymentParams),
-          })
-          .then(response => response.json())
-          .then(data => {
-              if (data.success === 1) {
-                  new PayTech({}).withOption({
-                      tokenUrl: data.redirect_url,
-                      prensentationMode: PayTech.OPEN_IN_SAME_TAB,
-                  }).send();
-              } else {
-                  alert("Erreur: " + data.error_message);
-              }
-          })
-          .catch(error => {
-              alert("Erreur de communication avec PayTech.");
-              console.error(error);
-          });
-      }
+function init_payment(transaction_id, amount, phone) {
+    setTempVar("Admin", "transaction_id");
+    const paymentParams = {
+        item_name: "Carte NFC",
+        item_price: amount,
+        currency: "XOF",
+        ref_command: transaction_id,
+        command_name: "776633882-USER-1",
+        env: "test",
+        ipn_url: "https://script.google.com/macros/s/AKfycbxxwv2A2LMzKnd76TxRTTxYsIGigR4vnMiVnJxQCmQAlGh2BMQlQ1VwplPOt_stWohlpQ/exec",
+        success_url: "https://ouzdark6.github.io/Flashpay/paytech.html?transaction_id=" + transaction_id,
+        cancel_url: "https://ouzdark6.github.io/Flashpay/paytech.html?transaction_id=" + transaction_id,
+        phone_number: phone // <-- numéro de téléphone ici
+    };
+
+    fetch('https://paytech.sn/api/payment/request-payment', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'API_KEY': P_API_KEY,
+            'API_SECRET': P_API_SECRET,
+        },
+        body: JSON.stringify(paymentParams),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success === 1) {
+            new PayTech({}).withOption({
+                tokenUrl: data.redirect_url,
+                prensentationMode: PayTech.OPEN_IN_SAME_TAB,
+            }).send();
+        } else {
+            alert("Erreur: " + data.error_message);
+        }
+    })
+    .catch(error => {
+        alert("Erreur de communication avec PayTech.");
+        console.error(error);
+    });
+}
+
   </script>
   
 </body>
