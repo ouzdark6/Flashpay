@@ -132,6 +132,87 @@
             display: none !important;
         }
 
+        .confirmation-container {
+            background-color: #fff;
+            padding: 40px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        .logo {
+            width: 150px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #2a538b;
+            font-size: 1.8em;
+            margin: 10px 0;
+        }
+
+        .subtitle {
+            color: gray;
+            opacity: 0.6;
+            font-size: 12px;
+        }
+
+        button {
+            background-color: #2a538b;
+            color: white;
+            padding: 14px 28px;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s;
+        }
+
+        button:hover {
+            background-color: #1a3a6b;
+        }
+
+        .hidden {
+            display: none;
+        }
+      
+        /* Style de l'overlay */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            display: none; /* Masqué par défaut */
+            justify-content: center;
+            align-items: center;
+            z-index: 9999; /* Pour s'assurer qu'il soit au-dessus des autres éléments */
+        }
+
+        /* Style du loader */
+        .loader {
+            border: 8px solid transparent;
+            border-top: 4px solid #2a538b;
+            border-radius: 50%;
+            width: 70px;
+            height: 70px;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Animation de rotation du loader */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        #confirmation-container, #nfcForm{
+          display: none;
+        }
+
     </style>
     <!-- Script TouchPay -->
     <script src="https://touchpay.gutouch.net/touchpayv2/script/touchpaynr/prod_touchpay-0.0.1.js"></script>
@@ -326,8 +407,8 @@
               command_name: "776633882-USER-1",
               env: "test",
               ipn_url: "https://script.google.com/macros/s/AKfycbxxwv2A2LMzKnd76TxRTTxYsIGigR4vnMiVnJxQCmQAlGh2BMQlQ1VwplPOt_stWohlpQ/exec",
-              success_url: "https://ouzdark6.github.io/Flashpay/status.html",
-              cancel_url: "https://ouzdark6.github.io/Flashpay/status.html",
+              success_url: "https://ouzdark6.github.io/Flashpay/paytech.html",
+              cancel_url: "https://ouzdark6.github.io/Flashpay/paytech.html",
           };
   
           fetch('https://paytech.sn/api/payment/request-payment', {
@@ -359,3 +440,124 @@
   
 </body>
 </html>
+
+
+<!-- status -->
+<div class="confirmation-container" id="confirmation-container" style="display:none;">
+  <img src="https://i.postimg.cc/cxt285nG/logo.jpg" alt="SparkLink Logo" class="logo">
+  <h1 id="payment-status" class="hidden">Paiement en cours</h1>
+  <p class="subtitle" id="status-message" class="hidden">Veuillez patienter, le paiement est en traitement.</p>
+  <button id="continue-button" class="hidden" onclick="redirectToFlashPay()">CONTINUER</button>
+</div>
+
+<!-- Overlay avec loader -->
+<div id="loader-overlay" class="overlay">
+  <div class="loader"></div>
+</div>
+
+<script>
+  function showLoader() {
+      const overlay = document.getElementById('loader-overlay');
+      overlay.style.display = 'flex';  // Affiche l'overlay et le loader
+  }
+
+  // Fonction pour cacher le loader
+  function hideLoader() {
+      const overlay = document.getElementById('loader-overlay');
+      overlay.style.display = 'none'; // Cache l'overlay et le loader
+  }
+
+  function redirectToFlashPay() {
+      window.location.href = "flashpay.html";
+  }
+
+  // Fonction pour obtenir la transaction
+  function getTransactionInfo(transactionId) {
+    const url = "https://script.google.com/macros/s/AKfycbxxwv2A2LMzKnd76TxRTTxYsIGigR4vnMiVnJxQCmQAlGh2BMQlQ1VwplPOt_stWohlpQ/exec"; // Remplace TON_SCRIPT_ID
+
+    fetch(url, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        body: new URLSearchParams({
+            transactionIdV: transactionId
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log("Résultat de la transaction :", data);
+
+        if (!data || !data.transactionData || !data.is_exist) {
+            // Si les données sont manquantes ou incorrectes, afficher "Transaction inexistente"
+            const paymentStatus = document.getElementById('payment-status');
+            const statusMessage = document.getElementById('status-message');
+            const continueButton = document.getElementById('continue-button');
+
+            paymentStatus.classList.remove('hidden');
+            statusMessage.classList.remove('hidden');
+            continueButton.classList.add('hidden'); // Pas de bouton à afficher
+
+            paymentStatus.textContent = 'Transaction inexistente';
+            statusMessage.textContent = 'Aucune transaction trouvée avec cet identifiant.';
+
+            hideLoader(); // Cacher le loader après la récupération des infos
+            return; // Sortir de la fonction si la transaction n'existe pas
+        }
+
+        const status = data.transactionData.STATUT;
+        const errorCode = data.transactionData.ERROR_CODE;
+
+        // Rendre visible le statut après récupération des données
+        const paymentStatus = document.getElementById('payment-status');
+        const statusMessage = document.getElementById('status-message');
+        const continueButton = document.getElementById('continue-button');
+
+        paymentStatus.classList.remove('hidden'); // Rendre le statut visible
+        statusMessage.classList.remove('hidden'); // Rendre le message visible
+        continueButton.classList.remove('hidden'); // Rendre le bouton visible
+
+        if (status === 'WAITING') {
+            paymentStatus.textContent = 'Paiement en cours de traitement';
+            statusMessage.textContent = 'Veuillez patienter, le paiement est en traitement.';
+            continueButton.classList.add('hidden'); // Cacher le bouton
+        } else if (status === 'NON' && !errorCode) {
+            paymentStatus.textContent = 'Paiement en attente de réception';
+            statusMessage.textContent = 'Votre paiement est en attente de réception.';
+            continueButton.classList.add('hidden'); // Cacher le bouton
+        } else if (status === 'NON' && errorCode) {
+            paymentStatus.textContent = 'Paiement en échec';
+            statusMessage.textContent = 'Votre paiement a échoué.';
+            continueButton.textContent = 'RÉESSAYER'; // Texte du bouton
+        } else if (status === 'OUI' && !errorCode) {
+            paymentStatus.textContent = 'Paiement réussi';
+            statusMessage.textContent = 'Votre paiement a été effectué avec succès.';
+            continueButton.textContent = 'CONTINUER'; // Texte du bouton
+        }
+
+        hideLoader(); // Cacher le loader après la récupération des infos
+    })
+    .catch(error => {
+        console.error("Erreur lors de la vérification :", error);
+        alert("Erreur lors de la vérification.");
+        hideLoader(); // Cacher le loader même en cas d'erreur
+    });
+}
+
+
+  // Vérification de la présence du `transaction_id` dans l'URL
+  const urlParams = new URLSearchParams(window.location.search);
+  const transaction__id = urlParams.get('transaction_id');
+
+  if (transaction__id) {
+      // Si `transaction_id` est défini, on affiche la section et on lance la récupération des infos
+      document.getElementById('confirmation-container').style.display = 'block';
+      document.getElementById('nfcForm').style.display = 'none';
+      showLoader(); // Afficher le loader
+      getTransactionInfo(transaction__id); // Récupérer les infos de la transaction
+  }else{
+    document.getElementById('nfcForm').style.display = 'block';
+
+  }
+</script>
+<!-- status -->
