@@ -1,4 +1,3 @@
-```
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -18,7 +17,9 @@
         montant: '5000'
       };
 
-      (new PayTech(postData)).withOption({
+      const paytech = new PayTech(postData);
+
+      paytech.withOption({
         requestTokenUrl: 'https://script.google.com/macros/s/AKfycbxZbooPDzyLxDektikJlsJ376lV45NxjPx7J76qom8w2rFW7ab0Z-IgFohWhoPVXaWT/exec',
         method: 'POST',
         headers: {
@@ -27,19 +28,16 @@
         },
         prensentationMode: PayTech.OPEN_IN_POPUP,
         didGetToken: function (token, redirectUrl) {
-          console.log('Token reçu:', token);
+          console.log('✅ Token reçu:', token);
         },
         didReceiveError: function (error) {
-          console.error('Erreur:', error);
+          console.error('❌ Erreur PayTech:', error);
         },
         didReceiveNonSuccessResponse: function (response) {
-          console.warn('Réponse non success:', response);
+          console.warn('⚠️ Réponse non success:', response);
         }
       }).send();
     }
   </script>
 </body>
 </html>
-
-
-```
