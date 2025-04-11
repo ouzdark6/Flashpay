@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -8,7 +7,7 @@
 </head>
 <body>
 
-  <button onclick="buy()">Payer 5 000 XOF</button>
+  <button onclick="buy()">UPayer 5 000 XOF</button>
 
   <script>
     function buy() {
@@ -21,13 +20,13 @@
       const paytech = new PayTech(postData);
 
       paytech.withOption({
-        requestTokenUrl: 'https://script.google.com/macros/s/AKfycbxZbooPDzyLxDektikJlsJ376lV45NxjPx7J76qom8w2rFW7ab0Z-IgFohWhoPVXaWT/exec',
+        requestTokenUrl: 'https://script.google.com/macros/s/AKfycbyVJpHQQsDHUt8_wMGMgG5tCVdP2sSEO4BRxmg0HQ3NHD0hmZv1hAOPOkPRv2Ot9lWv/exec',
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
           'Accept': 'application/json'
         },
-        prensentationMode: PayTech.OPEN_IN_POPUP,
+        presentationMode: PayTech.OPEN_IN_POPUP,  <!-- Correction ici -->
 
         // Quand PayTech reçoit un token avec succès
         didGetToken: function (token, redirectUrl) {
