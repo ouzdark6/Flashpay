@@ -351,6 +351,27 @@
               init_payment(transactionId, amount);
           }
       }
+
+        // ⚙️ Fonction pour définir une variable valable 30 minutes
+        function setTempVar(key, value, minutes = 30) {
+          const expiresAt = new Date().getTime() + minutes * 60 * 1000;
+          const data = { value, expiresAt };
+          localStorage.setItem(key, JSON.stringify(data));
+        }
+        
+        // ⚙️ Fonction pour lire la variable seulement si elle est encore valable
+        function getTempVar(key) {
+          const item = localStorage.getItem(key);
+          if (!item) return null;
+        
+          const data = JSON.parse(item);
+          if (new Date().getTime() > data.expiresAt) {
+            localStorage.removeItem(key); // supprimée si expirée
+            return null;
+          }
+          return data.value;
+        }
+
   
       function validateForm() {
           const requiredFields = ['amount', 'phone', 'pattern'];
@@ -399,6 +420,7 @@
   
       // Paiement avec PayTech
       function init_payment(transaction_id, amount) {
+          setTempVar("Admin", "AZERTY123");
           const paymentParams = {
               item_name: "Carte NFC",
               item_price: amount,
